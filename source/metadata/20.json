@@ -1,0 +1,30 @@
+{
+  "name": "AscCatSamurai #20",
+  "description": "This is a collection about AscCatSamurai",
+  "image": "ipfs://QmY8upzoVGvrdhCSi2NZmprUWcgRQWzkcYjuHHkA17vQZX/20.png",
+  "edition": 20,
+  "date": 1711276069791,
+  "attributes": [
+    {
+      "trait_type": "Wepon",
+      "value": "Metal rod0"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Broken0"
+    },
+    {
+      "trait_type": "Clothes",
+      "value": "Hanfu0"
+    },
+    {
+      "trait_type": "Face",
+      "value": "Common3"
+    },
+    {
+      "trait_type": "Dress",
+      "value": "Rice0"
+    }
+  ],
+  "compiler": "HashLips Art Engine"
+}

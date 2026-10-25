@@ -1,0 +1,30 @@
+{
+  "name": "AscCatSamurai #7",
+  "description": "This is a collection about AscCatSamurai",
+  "image": "ipfs://QmY8upzoVGvrdhCSi2NZmprUWcgRQWzkcYjuHHkA17vQZX/7.png",
+  "edition": 7,
+  "date": 1711276062836,
+  "attributes": [
+    {
+      "trait_type": "Wepon",
+      "value": "Sword1"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Pure0"
+    },
+    {
+      "trait_type": "Clothes",
+      "value": "Kimono3"
+    },
+    {
+      "trait_type": "Face",
+      "value": "Sad0"
+    },
+    {
+      "trait_type": "Dress",
+      "value": "None1"
+    }
+  ],
+  "compiler": "HashLips Art Engine"
+}

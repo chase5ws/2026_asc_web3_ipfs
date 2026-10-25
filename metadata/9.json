@@ -1,0 +1,30 @@
+{
+  "name": "AscCatSamurai #9",
+  "description": "This is a collection about AscCatSamurai",
+  "image": "https://chase5ws.github.io/2026_asc_web3_ipfs/images/9.png",
+  "edition": 9,
+  "date": 1711276063803,
+  "attributes": [
+    {
+      "trait_type": "Wepon",
+      "value": "War chess0"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Original0"
+    },
+    {
+      "trait_type": "Clothes",
+      "value": "Samurai armor0"
+    },
+    {
+      "trait_type": "Face",
+      "value": "Relax0"
+    },
+    {
+      "trait_type": "Dress",
+      "value": "Rice1"
+    }
+  ],
+  "compiler": "HashLips Art Engine"
+}

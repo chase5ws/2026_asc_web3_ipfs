@@ -1,0 +1,30 @@
+{
+  "name": "AscCatSamurai #30",
+  "description": "This is a collection about AscCatSamurai",
+  "image": "ipfs://QmY8upzoVGvrdhCSi2NZmprUWcgRQWzkcYjuHHkA17vQZX/30.png",
+  "edition": 30,
+  "date": 1711276075598,
+  "attributes": [
+    {
+      "trait_type": "Wepon",
+      "value": "Bamboo sword1"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Broken2"
+    },
+    {
+      "trait_type": "Clothes",
+      "value": "Kimono0"
+    },
+    {
+      "trait_type": "Face",
+      "value": "Happy0"
+    },
+    {
+      "trait_type": "Dress",
+      "value": "Cigar0"
+    }
+  ],
+  "compiler": "HashLips Art Engine"
+}

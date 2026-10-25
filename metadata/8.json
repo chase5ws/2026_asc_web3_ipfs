@@ -1,0 +1,30 @@
+{
+  "name": "AscCatSamurai #8",
+  "description": "This is a collection about AscCatSamurai",
+  "image": "https://chase5ws.github.io/2026_asc_web3_ipfs/images/8.png",
+  "edition": 8,
+  "date": 1711276063060,
+  "attributes": [
+    {
+      "trait_type": "Wepon",
+      "value": "Metal rod1"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Broken3"
+    },
+    {
+      "trait_type": "Clothes",
+      "value": "Ninja suit0"
+    },
+    {
+      "trait_type": "Face",
+      "value": "Common1"
+    },
+    {
+      "trait_type": "Dress",
+      "value": "None2"
+    }
+  ],
+  "compiler": "HashLips Art Engine"
+}

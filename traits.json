@@ -1,0 +1,382 @@
+{
+  "version": 1,
+  "order": [
+    "Wepon",
+    "Body",
+    "Clothes",
+    "Face",
+    "Dress"
+  ],
+  "weights": {
+    "normal": 100,
+    "rare": 35,
+    "super": 12
+  },
+  "gacha": {
+    "miss": 602,
+    "rare": 64,
+    "super": 26
+  },
+  "aliases": {
+    "Dress": {
+      "None1": "None0",
+      "None2": "None0"
+    }
+  },
+  "categories": [
+    {
+      "trait_type": "Wepon",
+      "options": [
+        {
+          "name": "Bamboo sword0",
+          "file": "layers/Wepon/Bamboo sword0.png",
+          "tier": "normal"
+        },
+        {
+          "name": "Bamboo sword1",
+          "file": "layers/Wepon/Bamboo sword1.png",
+          "tier": "normal"
+        },
+        {
+          "name": "Bamboo sword2",
+          "file": "layers/Wepon/Bamboo sword2.png",
+          "tier": "normal"
+        },
+        {
+          "name": "Longbow0",
+          "file": "layers/Wepon/Longbow0.png",
+          "tier": "normal"
+        },
+        {
+          "name": "Longbow1",
+          "file": "layers/Wepon/Longbow1.png",
+          "tier": "normal"
+        },
+        {
+          "name": "Longbow2",
+          "file": "layers/Wepon/Longbow2.png",
+          "tier": "normal"
+        },
+        {
+          "name": "Metal rod0",
+          "file": "layers/Wepon/Metal rod0.png",
+          "tier": "normal"
+        },
+        {
+          "name": "Metal rod1",
+          "file": "layers/Wepon/Metal rod1.png",
+          "tier": "normal"
+        },
+        {
+          "name": "Sword0",
+          "file": "layers/Wepon/Sword0.png",
+          "tier": "normal"
+        },
+        {
+          "name": "Sword1",
+          "file": "layers/Wepon/Sword1.png",
+          "tier": "normal"
+        },
+        {
+          "name": "Sword99",
+          "file": "layers/Wepon/Sword2.png",
+          "tier": "super",
+          "zh": "金柄武士刀"
+        },
+        {
+          "name": "War chess0",
+          "file": "layers/Wepon/War chess0.png",
+          "tier": "normal"
+        },
+        {
+          "name": "War chess1",
+          "file": "layers/Wepon/War chess1.png",
+          "tier": "normal"
+        }
+      ]
+    },
+    {
+      "trait_type": "Body",
+      "options": [
+        {
+          "name": "Broken0",
+          "file": "layers/Body/Broken.png",
+          "tier": "normal"
+        },
+        {
+          "name": "Broken1",
+          "file": "layers/Body/6.png",
+          "tier": "normal"
+        },
+        {
+          "name": "Broken2",
+          "file": "layers/Body/7.png",
+          "tier": "normal"
+        },
+        {
+          "name": "Broken3",
+          "file": "layers/Body/8.png",
+          "tier": "normal"
+        },
+        {
+          "name": "Original0",
+          "file": "layers/Body/Orange.png",
+          "tier": "rare",
+          "zh": "橘色長毛耳環"
+        },
+        {
+          "name": "Original1",
+          "file": "layers/Body/3.png",
+          "tier": "rare",
+          "zh": "白色長毛耳環"
+        },
+        {
+          "name": "Pure0",
+          "file": "layers/Body/Black.png",
+          "tier": "normal"
+        },
+        {
+          "name": "Pure1",
+          "file": "layers/Body/4.png",
+          "tier": "normal"
+        },
+        {
+          "name": "Pure2",
+          "file": "layers/Body/5.png",
+          "tier": "normal"
+        },
+        {
+          "name": "Tabby0",
+          "file": "layers/Body/Tabby.png",
+          "tier": "normal"
+        },
+        {
+          "name": "Tabby1",
+          "file": "layers/Body/1.png",
+          "tier": "normal"
+        },
+        {
+          "name": "Tabby2",
+          "file": "layers/Body/2.png",
+          "tier": "normal"
+        },
+        {
+          "name": "Tuxedo0",
+          "file": "layers/Body/Tuxedo.png",
+          "tier": "normal"
+        }
+      ]
+    },
+    {
+      "trait_type": "Clothes",
+      "options": [
+        {
+          "name": "Armor0",
+          "file": "layers/Clothes/Armor0.png",
+          "tier": "normal"
+        },
+        {
+          "name": "Armor1",
+          "file": "layers/Clothes/Armor1.png",
+          "tier": "super",
+          "zh": "黃金鎧甲"
+        },
+        {
+          "name": "Armor2",
+          "file": "layers/Clothes/Armor2.png",
+          "tier": "rare",
+          "zh": "粉色鎧甲"
+        },
+        {
+          "name": "Hanfu0",
+          "file": "layers/Clothes/Hanfu0.png",
+          "tier": "normal"
+        },
+        {
+          "name": "Hanfu1",
+          "file": "layers/Clothes/Hanfu1.png",
+          "tier": "normal"
+        },
+        {
+          "name": "Kimono0",
+          "file": "layers/Clothes/Kimono0.png",
+          "tier": "normal"
+        },
+        {
+          "name": "Kimono1",
+          "file": "layers/Clothes/Kimono1.png",
+          "tier": "normal"
+        },
+        {
+          "name": "Kimono2",
+          "file": "layers/Clothes/Kimono2.png",
+          "tier": "normal"
+        },
+        {
+          "name": "Kimono3",
+          "file": "layers/Clothes/Kimono3.png",
+          "tier": "normal"
+        },
+        {
+          "name": "Ninja suit0",
+          "file": "layers/Clothes/Ninja suit0.png",
+          "tier": "normal"
+        },
+        {
+          "name": "Samurai armor0",
+          "file": "layers/Clothes/Samurai armor0.png",
+          "tier": "normal"
+        },
+        {
+          "name": "Samurai armor1",
+          "file": "layers/Clothes/Samurai armor1.png",
+          "tier": "normal"
+        }
+      ]
+    },
+    {
+      "trait_type": "Face",
+      "options": [
+        {
+          "name": "Common0",
+          "file": "layers/Face/Common0.png",
+          "tier": "normal"
+        },
+        {
+          "name": "Common1",
+          "file": "layers/Face/Common1.png",
+          "tier": "normal"
+        },
+        {
+          "name": "Common2",
+          "file": "layers/Face/Common2.png",
+          "tier": "normal"
+        },
+        {
+          "name": "Common3",
+          "file": "layers/Face/Common3.png",
+          "tier": "normal"
+        },
+        {
+          "name": "Common99",
+          "file": "layers/Face/Common99.png",
+          "tier": "super",
+          "zh": "金色閃電眼"
+        },
+        {
+          "name": "Happy0",
+          "file": "layers/Face/Happy0.png",
+          "tier": "normal"
+        },
+        {
+          "name": "Relax0",
+          "file": "layers/Face/Relax0.png",
+          "tier": "normal"
+        },
+        {
+          "name": "Relax1",
+          "file": "layers/Face/Relax1.png",
+          "tier": "normal"
+        },
+        {
+          "name": "Sad0",
+          "file": "layers/Face/Sad0.png",
+          "tier": "normal"
+        },
+        {
+          "name": "Sad1",
+          "file": "layers/Face/Sad1.png",
+          "tier": "normal"
+        },
+        {
+          "name": "Sad2",
+          "file": "layers/Face/Sad2.png",
+          "tier": "normal"
+        },
+        {
+          "name": "Scar0",
+          "file": "layers/Face/Scar0.png",
+          "tier": "normal"
+        },
+        {
+          "name": "Scar1",
+          "file": "layers/Face/Scar1.png",
+          "tier": "normal"
+        },
+        {
+          "name": "Scar2",
+          "file": "layers/Face/Scar2.png",
+          "tier": "rare",
+          "zh": "紅眼刀疤"
+        }
+      ]
+    },
+    {
+      "trait_type": "Dress",
+      "options": [
+        {
+          "name": "Bamboo hat0",
+          "file": "layers/Dress/Bamboo hat.png",
+          "tier": "normal"
+        },
+        {
+          "name": "Bamboo hat1",
+          "file": "layers/Dress/4.png",
+          "tier": "normal"
+        },
+        {
+          "name": "Bamboo hat2",
+          "file": "layers/Dress/5.png",
+          "tier": "normal"
+        },
+        {
+          "name": "Cigar0",
+          "file": "layers/Dress/11.png",
+          "tier": "normal"
+        },
+        {
+          "name": "Cigar1",
+          "file": "layers/Dress/Cigar.png",
+          "tier": "normal"
+        },
+        {
+          "name": "Fox mask0",
+          "file": "layers/Dress/Fox mask.png",
+          "tier": "rare",
+          "zh": "狐狸面具"
+        },
+        {
+          "name": "Rice0",
+          "file": "layers/Dress/Rice.png",
+          "tier": "normal"
+        },
+        {
+          "name": "Rice1",
+          "file": "layers/Dress/8.png",
+          "tier": "normal"
+        },
+        {
+          "name": "Rice2",
+          "file": "layers/Dress/7.png",
+          "tier": "normal"
+        },
+        {
+          "name": "Veil0",
+          "file": "layers/Dress/Veil.png",
+          "tier": "normal"
+        },
+        {
+          "name": "Veil1",
+          "file": "layers/Dress/1.png",
+          "tier": "normal"
+        },
+        {
+          "name": "None0",
+          "file": null,
+          "tier": "normal",
+          "zh": "無配件"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "name": "AscCatSamurai #28",
+  "description": "This is a collection about AscCatSamurai",
+  "image": "ipfs://QmY8upzoVGvrdhCSi2NZmprUWcgRQWzkcYjuHHkA17vQZX/28.png",
+  "edition": 28,
+  "date": 1711276074206,
+  "attributes": [
+    {
+      "trait_type": "Wepon",
+      "value": "Longbow1"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Pure1"
+    },
+    {
+      "trait_type": "Clothes",
+      "value": "Ninja suit0"
+    },
+    {
+      "trait_type": "Face",
+      "value": "Common2"
+    },
+    {
+      "trait_type": "Dress",
+      "value": "None0"
+    }
+  ],
+  "compiler": "HashLips Art Engine"
+}

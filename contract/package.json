@@ -1,0 +1,22 @@
+{
+	"name": "asc-cat-samurai-v2",
+	"version": "1.0.0",
+	"description": "AscCatSamuraiV2：配件記在鏈上的 NFT（隨機鑄造、VIP 自訂、轉蛋、換裝、舊 NFT 領回）",
+	"author": "Chase.Tseng",
+	"license": "MIT",
+	"private": true,
+	"scripts": {
+		"compile": "hardhat compile",
+		"test": "hardhat test",
+		"deploy:amoy": "hardhat run scripts/deploy.js --network amoy",
+		"deploy:polygon": "hardhat run scripts/deploy.js --network polygon",
+		"status:amoy": "hardhat run scripts/status.js --network amoy",
+		"status:polygon": "hardhat run scripts/status.js --network polygon"
+	},
+	"devDependencies": {
+		"@nomicfoundation/hardhat-toolbox": "^5.0.0",
+		"@openzeppelin/contracts": "5.0.2",
+		"dotenv": "^16.4.5",
+		"hardhat": "^2.22.17"
+	}
+}

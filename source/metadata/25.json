@@ -1,0 +1,30 @@
+{
+  "name": "AscCatSamurai #25",
+  "description": "This is a collection about AscCatSamurai",
+  "image": "ipfs://QmY8upzoVGvrdhCSi2NZmprUWcgRQWzkcYjuHHkA17vQZX/25.png",
+  "edition": 25,
+  "date": 1711276072540,
+  "attributes": [
+    {
+      "trait_type": "Wepon",
+      "value": "War chess0"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Broken0"
+    },
+    {
+      "trait_type": "Clothes",
+      "value": "Kimono3"
+    },
+    {
+      "trait_type": "Face",
+      "value": "Common1"
+    },
+    {
+      "trait_type": "Dress",
+      "value": "Veil1"
+    }
+  ],
+  "compiler": "HashLips Art Engine"
+}

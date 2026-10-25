@@ -1,0 +1,30 @@
+{
+  "name": "AscCatSamurai #24",
+  "description": "This is a collection about AscCatSamurai",
+  "image": "ipfs://QmY8upzoVGvrdhCSi2NZmprUWcgRQWzkcYjuHHkA17vQZX/24.png",
+  "edition": 24,
+  "date": 1711276072076,
+  "attributes": [
+    {
+      "trait_type": "Wepon",
+      "value": "Metal rod1"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Pure2"
+    },
+    {
+      "trait_type": "Clothes",
+      "value": "Kimono1"
+    },
+    {
+      "trait_type": "Face",
+      "value": "Sad1"
+    },
+    {
+      "trait_type": "Dress",
+      "value": "None0"
+    }
+  ],
+  "compiler": "HashLips Art Engine"
+}

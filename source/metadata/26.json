@@ -1,0 +1,30 @@
+{
+  "name": "AscCatSamurai #26",
+  "description": "This is a collection about AscCatSamurai",
+  "image": "ipfs://QmY8upzoVGvrdhCSi2NZmprUWcgRQWzkcYjuHHkA17vQZX/26.png",
+  "edition": 26,
+  "date": 1711276073132,
+  "attributes": [
+    {
+      "trait_type": "Wepon",
+      "value": "Metal rod0"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Original1"
+    },
+    {
+      "trait_type": "Clothes",
+      "value": "Samurai armor0"
+    },
+    {
+      "trait_type": "Face",
+      "value": "Common2"
+    },
+    {
+      "trait_type": "Dress",
+      "value": "None0"
+    }
+  ],
+  "compiler": "HashLips Art Engine"
+}

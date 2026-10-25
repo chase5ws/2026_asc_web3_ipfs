@@ -1,0 +1,30 @@
+{
+  "name": "AscCatSamurai #22",
+  "description": "This is a collection about AscCatSamurai",
+  "image": "ipfs://QmY8upzoVGvrdhCSi2NZmprUWcgRQWzkcYjuHHkA17vQZX/22.png",
+  "edition": 22,
+  "date": 1711276071335,
+  "attributes": [
+    {
+      "trait_type": "Wepon",
+      "value": "Sword0"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Tabby2"
+    },
+    {
+      "trait_type": "Clothes",
+      "value": "Ninja suit0"
+    },
+    {
+      "trait_type": "Face",
+      "value": "Common0"
+    },
+    {
+      "trait_type": "Dress",
+      "value": "None2"
+    }
+  ],
+  "compiler": "HashLips Art Engine"
+}
