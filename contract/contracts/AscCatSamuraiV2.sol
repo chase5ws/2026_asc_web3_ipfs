@@ -11,24 +11,24 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
 
-interface IOldNFT {
-    function ownerOf(uint256 tokenId) external view returns (address);
-}
-
-/// @title AscCatSamuraiV2 - 配件記在鏈上的 NFT：隨機鑄造、VIP 自訂、轉蛋、換裝、舊 NFT 領回
+/// @title AscCatSamuraiV2 - 配件記在鏈上的 NFT：盲盒、隨機鑄造、VIP 自訂、轉蛋、換裝、空投（全新系列，編號從 0 開始）
 /// @notice 配件類別固定 5 類（順序）：0 Wepon、1 Body、2 Clothes、3 Face、4 Dress。
 ///   每類的選項編號對照表在 2026_asc_web3_ipfs 的 traits.json。
 ///   付款一律用 USDT（Polygon），直接轉給 treasury（Safe 多簽），合約本身不存錢。
 ///
-///   claim(ids)                舊合約 0~30 號的持有者免費領回同款（同編號、同配件）
+///   reveal(ids)               持有者：把自己的盲盒解盲（配件在鑄造時就決定，解盲後才公開）
+///   airdrop(addresses)        owner：免費發盲盒給一批錢包，配件隨機
+///   airdropPreset(to, traits) owner：免費發盲盒，解盲後是指定的配件（例如舊系列持有者拿回原本的樣子）
 ///   randomMint()              任何人：隨機配件（費用 randomFee，可為 0；每個錢包有上限）
 ///   buyVip()                  付 vipFee 成為永久 VIP
 ///   customMint(traits)        VIP：自選配件，每次付 customFee
 ///   changeTraits(id, traits)  VIP：替自己的 NFT 換裝，每次付 changeFee
-///   gacha(times)              VIP：轉蛋抽稀有配件，每抽付 gachaFee；抽中的配件放進背包
+///   buyPulls(n)               任何人：先存 USDT 買 n 次轉蛋機會（付款直接進 treasury，例如 AscPoint 金庫）
+///   gacha(times)              轉蛋抽稀有配件：先用存好的次數，不夠的部分當場付 gachaFee；抽中的配件放進背包
+///                             （owner 可用 setGachaVipOnly 改成只限 VIP）
 ///
 ///   稀有配件（rare）不能直接選，要從背包消耗 1 個；換裝換下來的稀有配件會退回背包（不會消失）。
-///   每一顆 NFT 的配件組合都不重複。
+///   每一顆 NFT 的配件組合都不重複。隨機鑄造、空投拿到的是盲盒；自訂鑄造、gift 直接是解盲狀態；盲盒要解盲後才能換裝。
 ///
 ///   偽隨機（每次都會發出 RandomSeed 事件，任何人都能驗算）：
 ///     seed = keccak256(abi.encode(上一個區塊的 hash, block.prevrandao, 呼叫者, nonce))
@@ -42,27 +42,25 @@ contract AscCatSamuraiV2 is ERC721Enumerable, Ownable2Step, Pausable, Reentrancy
     uint256 public constant CATS = 5;
     uint256 public constant MAX_GACHA_PER_TX = 10;
     uint256 private constant MAX_REROLL = 20;
+    uint256 public constant MAX_AIRDROP_PER_TX = 100;
 
     // 隨機的用途（RandomSeed 事件）
     uint8 public constant PURPOSE_MINT = 1;
     uint8 public constant PURPOSE_GACHA = 2;
 
     // Minted 事件的鑄造方式
-    uint8 public constant KIND_CLAIM = 0;
     uint8 public constant KIND_RANDOM = 1;
     uint8 public constant KIND_CUSTOM = 2;
     uint8 public constant KIND_GIFT = 3;
+    uint8 public constant KIND_AIRDROP = 4;
 
     IERC20 public immutable usdt;
-    IOldNFT public immutable oldNft;
-    uint256 public immutable legacyCount;
 
     address public treasury;
     string private _base;
     uint256 public maxSupply;
     uint256 public nextId;
     bool public saleOpen;
-    bool public legacyLocked;
 
     uint256 public randomFee;
     uint256 public customFee;
@@ -70,6 +68,7 @@ contract AscCatSamuraiV2 is ERC721Enumerable, Ownable2Step, Pausable, Reentrancy
     uint256 public vipFee;
     uint256 public gachaFee;
     uint256 public maxRandomPerWallet; // 0 = 不限
+    bool public gachaVipOnly; // true = 只有 VIP 能轉蛋
 
     struct Option {
         uint16 weight; // 隨機鑄造的權重（0 = 隨機抽不到）
@@ -86,20 +85,23 @@ contract AscCatSamuraiV2 is ERC721Enumerable, Ownable2Step, Pausable, Reentrancy
     uint32 public missWeight;
 
     mapping(uint256 => uint40) private _traits; // tokenId => 打包後的配件
+    mapping(uint256 => bool) private _hidden; // tokenId => 還是盲盒
     mapping(uint40 => uint256) private _comboTokenPlus1; // 配件組合 => tokenId + 1（0 = 沒人用）
-    mapping(uint256 => bool) public legacyReady; // 舊編號已設定配件
     mapping(address => bool) public isVip;
     mapping(address => uint256) public randomMinted;
     mapping(address => uint256) public totalPaid;
+    mapping(address => uint256) public pulls; // 已買好的轉蛋次數
     mapping(address => mapping(uint16 => uint256)) private _items; // 背包：使用者 => (cat<<8|idx) => 數量
     uint256 public nonce;
 
     event Minted(uint256 indexed tokenId, address indexed to, uint8 kind, uint40 traits);
+    event Revealed(uint256 indexed tokenId, address indexed owner, uint40 traits);
     event TraitsChanged(uint256 indexed tokenId, address indexed owner, uint40 oldTraits, uint40 newTraits);
     event RandomSeed(address indexed user, uint8 indexed purpose, uint256 indexed ref, bytes32 prevBlockHash, uint256 prevrandao, uint256 nonce, bytes32 seed);
     event GachaPull(address indexed user, bytes32 seed, uint256 roll, uint256 totalWeight, bool hit, uint8 cat, uint8 idx);
     event ItemChanged(address indexed user, uint8 cat, uint8 idx, uint256 balance);
     event VipChanged(address indexed user, bool vip);
+    event PullsChanged(address indexed user, uint256 balance);
     event Paid(address indexed user, string what, uint256 amount);
     event PricesChanged(uint256 randomFee, uint256 customFee, uint256 changeFee, uint256 vipFee, uint256 gachaFee);
     event OptionsChanged(uint256 cat, uint256 count);
@@ -108,7 +110,6 @@ contract AscCatSamuraiV2 is ERC721Enumerable, Ownable2Step, Pausable, Reentrancy
     event SaleChanged(bool open, uint256 maxRandomPerWallet);
     event MaxSupplyChanged(uint256 maxSupply);
     event BaseURIChanged(string baseURI);
-    event LegacyLocked();
 
     error ZeroAddress();
     error SaleClosed();
@@ -121,73 +122,44 @@ contract AscCatSamuraiV2 is ERC721Enumerable, Ownable2Step, Pausable, Reentrancy
     error NoItem(uint256 cat, uint256 idx);
     error NotTokenOwner(uint256 tokenId);
     error NoChange();
+    error NotRevealed(uint256 tokenId);
+    error AlreadyRevealed(uint256 tokenId);
     error BadAmount();
-    error NotLegacy(uint256 tokenId);
-    error LegacyNotReady(uint256 tokenId);
-    error NotOldOwner(uint256 tokenId);
-    error IsLocked();
     error LengthMismatch();
     error CannotShrink();
     error NoRandomResult();
     error EmptyPool();
 
-    constructor(
-        address initialOwner,
-        address usdt_,
-        address treasury_,
-        address oldNft_,
-        uint256 legacyCount_,
-        uint256 maxSupply_,
-        string memory baseURI_
-    ) ERC721("Asc Cat Samurai V2", "ACS2") Ownable(initialOwner) {
+    constructor(address initialOwner, address usdt_, address treasury_, uint256 maxSupply_, string memory baseURI_) ERC721("Asc Cat Samurai V2", "ACS2") Ownable(initialOwner) {
         if (usdt_ == address(0) || treasury_ == address(0)) revert ZeroAddress();
-        if (maxSupply_ < legacyCount_) revert BadAmount();
+        if (maxSupply_ == 0) revert BadAmount();
         usdt = IERC20(usdt_);
         treasury = treasury_;
-        oldNft = IOldNFT(oldNft_);
-        legacyCount = legacyCount_;
         maxSupply = maxSupply_;
-        nextId = legacyCount_;
         _base = baseURI_;
     }
 
     // ───────────────────────────── 使用者 ─────────────────────────────
 
-    /// @notice 舊合約的持有者免費領回同編號、同配件的 V2
-    function claim(uint256[] calldata ids) external whenNotPaused nonReentrant {
-        for (uint256 i; i < ids.length; ++i) {
-            uint256 id = ids[i];
-            if (id >= legacyCount) revert NotLegacy(id);
-            if (!legacyReady[id]) revert LegacyNotReady(id);
-            if (oldNft.ownerOf(id) != msg.sender) revert NotOldOwner(id);
-            _safeMint(msg.sender, id); // 已領過會 revert（ERC721InvalidSender）
-            emit Minted(id, msg.sender, KIND_CLAIM, _traits[id]);
-        }
-    }
-
     /// @notice 隨機鑄造一顆
     function randomMint() external whenNotPaused nonReentrant returns (uint256 id) {
         if (!saleOpen) revert SaleClosed();
         if (maxRandomPerWallet != 0 && randomMinted[msg.sender] >= maxRandomPerWallet) revert WalletLimit();
-        id = _takeId();
         randomMinted[msg.sender]++;
         _pay(randomFee, "random");
+        id = _mintRandom(msg.sender, KIND_RANDOM, true, true);
+    }
 
-        bytes32 seed = _seed(PURPOSE_MINT, id);
-        uint40 combo;
-        bool ok;
-        for (uint256 r; r < MAX_REROLL; ++r) {
-            combo = _rollCombo(seed);
-            if (_comboTokenPlus1[combo] == 0) {
-                ok = true;
-                break;
-            }
-            seed = keccak256(abi.encode(seed));
+    /// @notice 解盲：公開自己盲盒的配件（可以一次解很多顆）
+    function reveal(uint256[] calldata ids) external whenNotPaused nonReentrant {
+        for (uint256 i; i < ids.length; ++i) {
+            uint256 id = ids[i];
+            if (ownerOf(id) != msg.sender) revert NotTokenOwner(id);
+            if (!_hidden[id]) revert AlreadyRevealed(id);
+            _hidden[id] = false;
+            emit Revealed(id, msg.sender, _traits[id]);
+            emit MetadataUpdate(id);
         }
-        if (!ok) revert NoRandomResult();
-        _setTraits(id, combo);
-        _safeMint(msg.sender, id);
-        emit Minted(id, msg.sender, KIND_RANDOM, combo);
     }
 
     /// @notice 付費成為永久 VIP
@@ -217,6 +189,7 @@ contract AscCatSamuraiV2 is ERC721Enumerable, Ownable2Step, Pausable, Reentrancy
     /// @notice VIP：替自己的 NFT 換裝；換下來的稀有配件退回背包，換上的稀有配件從背包消耗
     function changeTraits(uint256 id, uint8[5] calldata t) external whenNotPaused nonReentrant {
         if (ownerOf(id) != msg.sender) revert NotTokenOwner(id);
+        if (_hidden[id]) revert NotRevealed(id);
         if (!isVip[msg.sender]) revert NotVip();
         uint40 oldCombo = _traits[id];
         uint40 combo = _pack(t);
@@ -234,12 +207,27 @@ contract AscCatSamuraiV2 is ERC721Enumerable, Ownable2Step, Pausable, Reentrancy
         emit TraitsChanged(id, msg.sender, oldCombo, combo);
     }
 
-    /// @notice VIP：轉蛋，一次 1~10 抽
+    /// @notice 先存 USDT 買轉蛋次數（之後再慢慢抽）
+    function buyPulls(uint256 n) external whenNotPaused nonReentrant {
+        if (n == 0 || n > 1000) revert BadAmount();
+        if (gachaVipOnly && !isVip[msg.sender]) revert NotVip();
+        _pay(gachaFee * n, "pulls");
+        pulls[msg.sender] += n;
+        emit PullsChanged(msg.sender, pulls[msg.sender]);
+    }
+
+    /// @notice 轉蛋，一次 1~10 抽：先用存好的次數，不夠的部分當場付款
     function gacha(uint256 times) external whenNotPaused nonReentrant {
-        if (!isVip[msg.sender]) revert NotVip();
+        if (gachaVipOnly && !isVip[msg.sender]) revert NotVip();
         if (times == 0 || times > MAX_GACHA_PER_TX) revert BadAmount();
         if (_pool.length == 0) revert EmptyPool();
-        _pay(gachaFee * times, "gacha");
+        uint256 have = pulls[msg.sender];
+        uint256 use = have < times ? have : times;
+        if (use > 0) {
+            pulls[msg.sender] = have - use;
+            emit PullsChanged(msg.sender, have - use);
+        }
+        _pay(gachaFee * (times - use), "gacha");
         uint256 total = missWeight;
         for (uint256 i; i < _pool.length; ++i) total += _pool[i].weight;
         for (uint256 n; n < times; ++n) {
@@ -265,21 +253,31 @@ contract AscCatSamuraiV2 is ERC721Enumerable, Ownable2Step, Pausable, Reentrancy
 
     // ───────────────────────────── 查詢 ─────────────────────────────
 
+    /// @notice 已解盲的配件（盲盒會 revert NotRevealed）
     function traitsOf(uint256 id) external view returns (uint8[5] memory t) {
         _requireOwned(id);
+        if (_hidden[id]) revert NotRevealed(id);
         uint40 p = _traits[id];
         for (uint256 c; c < CATS; ++c) t[c] = uint8(p >> (8 * c));
     }
 
-    /// @notice 給自動出圖程式用：一次讀 [from, to) 的存在與否與打包後的配件
-    function traitsRange(uint256 from, uint256 to) external view returns (bool[] memory exists, uint40[] memory traits) {
+    function isRevealed(uint256 id) external view returns (bool) {
+        _requireOwned(id);
+        return !_hidden[id];
+    }
+
+    /// @notice 給自動出圖程式用：一次讀 [from, to) 的存在與否、是否已解盲、打包後的配件（盲盒回傳 0）
+    function traitsRange(uint256 from, uint256 to) external view returns (bool[] memory exists, bool[] memory shown, uint40[] memory traits) {
         if (to > nextId) to = nextId;
         if (from > to) from = to;
         exists = new bool[](to - from);
+        shown = new bool[](to - from);
         traits = new uint40[](to - from);
         for (uint256 i = from; i < to; ++i) {
-            exists[i - from] = _ownerOf(i) != address(0);
-            traits[i - from] = _traits[i];
+            bool e = _ownerOf(i) != address(0);
+            exists[i - from] = e;
+            shown[i - from] = e && !_hidden[i];
+            traits[i - from] = shown[i - from] ? _traits[i] : 0;
         }
     }
 
@@ -377,24 +375,16 @@ contract AscCatSamuraiV2 is ERC721Enumerable, Ownable2Step, Pausable, Reentrancy
         emit GachaPoolChanged(cats.length, miss);
     }
 
-    /// @notice 設定舊 0~30 號的配件（領回前要先設定；lockLegacy 之後不能再改）
-    function setLegacyTraits(uint256[] calldata ids, uint8[5][] calldata t) external onlyOwner {
-        if (legacyLocked) revert IsLocked();
-        if (ids.length != t.length) revert LengthMismatch();
-        for (uint256 i; i < ids.length; ++i) {
-            uint256 id = ids[i];
-            if (id >= legacyCount) revert NotLegacy(id);
-            if (_ownerOf(id) != address(0)) revert IsLocked();
-            if (legacyReady[id]) delete _comboTokenPlus1[_traits[id]];
-            for (uint256 c; c < CATS; ++c) _checkOption(c, t[i][c]);
-            _setTraits(id, _pack(t[i]));
-            legacyReady[id] = true;
-        }
+
+
+    function setGachaVipOnly(bool v) external onlyOwner {
+        gachaVipOnly = v;
     }
 
-    function lockLegacy() external onlyOwner {
-        legacyLocked = true;
-        emit LegacyLocked();
+    /// @notice 活動用：直接送轉蛋次數
+    function givePulls(address user, uint256 n) external onlyOwner {
+        pulls[user] += n;
+        emit PullsChanged(user, pulls[user]);
     }
 
     function setVip(address user, bool vip) external onlyOwner {
@@ -406,6 +396,33 @@ contract AscCatSamuraiV2 is ERC721Enumerable, Ownable2Step, Pausable, Reentrancy
     function giveItems(address user, uint8 cat, uint8 idx, uint256 amount) external onlyOwner {
         _checkOption(cat, idx);
         _addItem(user, cat, idx, amount);
+    }
+
+    /// @notice owner：免費發盲盒給一批錢包，配件隨機（會發 RandomSeed 事件，解盲後可驗算）
+    /// @dev 用 _mint（不呼叫收款合約），避免某個合約錢包不收 NFT 時整批失敗；同一個地址可以重複出現＝發多顆
+    function airdrop(address[] calldata to) external onlyOwner nonReentrant returns (uint256 firstId) {
+        if (to.length == 0 || to.length > MAX_AIRDROP_PER_TX) revert BadAmount();
+        firstId = nextId;
+        for (uint256 i; i < to.length; ++i) {
+            if (to[i] == address(0)) revert ZeroAddress();
+            _mintRandom(to[i], KIND_AIRDROP, false, true);
+        }
+    }
+
+    /// @notice owner：免費發盲盒，解盲後是指定的配件（例如舊系列持有者拿回原本的樣子；稀有配件不消耗背包）
+    function airdropPreset(address[] calldata to, uint8[5][] calldata t) external onlyOwner nonReentrant returns (uint256 firstId) {
+        if (to.length != t.length) revert LengthMismatch();
+        if (to.length == 0 || to.length > MAX_AIRDROP_PER_TX) revert BadAmount();
+        firstId = nextId;
+        for (uint256 i; i < to.length; ++i) {
+            if (to[i] == address(0)) revert ZeroAddress();
+            uint256 id = _takeId();
+            for (uint256 c; c < CATS; ++c) _checkOption(c, t[i][c]);
+            _setTraits(id, _pack(t[i]));
+            _hidden[id] = true;
+            _mint(to[i], id);
+            emit Minted(id, to[i], KIND_AIRDROP, 0);
+        }
     }
 
     /// @notice 活動用：免費送一顆指定配件的 NFT（不消耗背包）
@@ -432,6 +449,27 @@ contract AscCatSamuraiV2 is ERC721Enumerable, Ownable2Step, Pausable, Reentrancy
     }
 
     // ───────────────────────────── 內部 ─────────────────────────────
+
+    function _mintRandom(address to, uint8 kind, bool safe, bool blind) private returns (uint256 id) {
+        id = _takeId();
+        bytes32 seed = _seed(PURPOSE_MINT, id);
+        uint40 combo;
+        bool ok;
+        for (uint256 r; r < MAX_REROLL; ++r) {
+            combo = _rollCombo(seed);
+            if (_comboTokenPlus1[combo] == 0) {
+                ok = true;
+                break;
+            }
+            seed = keccak256(abi.encode(seed));
+        }
+        if (!ok) revert NoRandomResult();
+        _setTraits(id, combo);
+        if (blind) _hidden[id] = true;
+        if (safe) _safeMint(to, id);
+        else _mint(to, id);
+        emit Minted(id, to, kind, blind ? 0 : combo); // 盲盒先不公開配件（解盲時發 Revealed）
+    }
 
     function _takeId() private returns (uint256 id) {
         id = nextId;

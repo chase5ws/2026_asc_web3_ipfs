@@ -1,7 +1,6 @@
 // 讀 ../traits.json，轉成合約 setOptions／setGachaPool 用的參數
 const path = require("path");
 const TRAITS = require(path.join(__dirname, "..", "..", "traits.json"));
-const LEGACY = require(path.join(__dirname, "..", "legacy-traits.json"));
 
 /** 每一類：{ weights: [...], rare: [...] }（rare＝稀有或超稀有，要消耗背包道具） */
 function optionArgs() {
@@ -25,4 +24,4 @@ function gachaArgs() {
     return { cats, idxs, weights, miss: TRAITS.gacha.miss };
 }
 
-module.exports = { TRAITS, LEGACY, optionArgs, gachaArgs };
+module.exports = { TRAITS, optionArgs, gachaArgs };

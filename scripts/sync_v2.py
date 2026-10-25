@@ -15,7 +15,6 @@ from PIL import Image
 
 ROOT = Path(__file__).resolve().parent.parent
 TRAITS = json.loads((ROOT / "traits.json").read_text(encoding="utf-8"))
-LEGACY = json.loads((ROOT / "contract" / "legacy-traits.json").read_text())
 OUT = ROOT / "v2"
 SIZE = 1024
 ADDRESS = os.environ.get("NFT_V2_ADDRESS", "").strip()
@@ -76,17 +75,11 @@ def layer(path):
 
 
 def render(tid, t, out):
-    # 舊 0~30 號沒換過裝 → 用原圖
-    if tid < len(LEGACY) and t == LEGACY[tid] and (ROOT / "images" / f"{tid}.png").exists():
-        im = Image.open(ROOT / "images" / f"{tid}.png").convert("RGBA")
-        if im.size != (SIZE, SIZE):
-            im = im.resize((SIZE, SIZE), Image.LANCZOS)
-    else:
-        im = Image.new("RGBA", (SIZE, SIZE), (0, 0, 0, 0))
-        for c, cat in enumerate(TRAITS["categories"]):
-            f = cat["options"][t[c]]["file"]
-            if f:
-                im.alpha_composite(layer(f))
+    im = Image.new("RGBA", (SIZE, SIZE), (0, 0, 0, 0))
+    for c, cat in enumerate(TRAITS["categories"]):
+        f = cat["options"][t[c]]["file"]
+        if f:
+            im.alpha_composite(layer(f))
     im.save(out, "PNG", optimize=True)
 
 
@@ -98,8 +91,6 @@ def metadata(tid, t, version):
         tiers.append(o["tier"])
     rarity = "Super Rare" if "super" in tiers else "Rare" if "rare" in tiers else "Common"
     attrs.append({"trait_type": "Rarity", "value": rarity})
-    if tid < len(LEGACY):
-        attrs.append({"trait_type": "Edition", "value": "Genesis"})
     return {
         "name": f"AscCatSamurai #{tid}",
         "description": "AscCatSamurai V2 - ASC鏢局的喵武士。配件記錄在 Polygon 鏈上，可以換裝。",
