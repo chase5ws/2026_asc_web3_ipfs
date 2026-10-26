@@ -1,5 +1,5 @@
-# 每 10 分鐘讀鏈上 V2 配件，有新鑄造或換裝就產生圖片與 metadata 並推上 GitHub Pages
-# 設定：repo → Settings → Secrets and variables → Actions → Variables 新增 NFT_V2_ADDRESS（可選 RPC_URL）
+# 每 10 分鐘讀鏈上 V2 事件（鑄造、解盲、換裝），更新 v2/state.json（穿著以這裡為準），產生圖片與 metadata 並推上 GitHub Pages
+# 設定：repo → Settings → Secrets and variables → Actions → Variables 新增 NFT_V2_ADDRESS、FROM_BLOCK（合約部署區塊，deployments/polygon.json 的 blocks.nft；可選 RPC_URL）
 name: Sync V2 NFT
 
 on:
@@ -24,9 +24,10 @@ jobs:
         with:
           python-version: "3.12"
       - run: pip install pillow
-      - name: 讀鏈上配件並出圖
+      - name: 讀鏈上事件並出圖
         env:
           NFT_V2_ADDRESS: ${{ vars.NFT_V2_ADDRESS }}
+          FROM_BLOCK: ${{ vars.FROM_BLOCK }}
           RPC_URL: ${{ vars.RPC_URL }}
         run: python3 scripts/sync_v2.py
       - name: 推上 GitHub
