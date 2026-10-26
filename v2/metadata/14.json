@@ -1,0 +1,11 @@
+{
+  "name": "AscCatSamurai #14",
+  "description": "AscCatSamurai V2 盲盒 - 在 ASC 鏢局網站解盲後揭曉外觀。",
+  "image": "https://chase5ws.github.io/2026_asc_web3_ipfs/v2/images/box.png",
+  "attributes": [
+    {
+      "trait_type": "Status",
+      "value": "Unrevealed"
+    }
+  ]
+}
