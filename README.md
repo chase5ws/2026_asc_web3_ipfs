@@ -61,3 +61,8 @@ scripts/
 - repo 必須是 **Public**（免費方案的 GitHub Pages 只支援公開 repo）。
 - 不要改 repo 名稱或 GitHub 帳號名稱，否則網址會變，要重新 `setBaseURI`。
 - GitHub Pages 單一站台建議 < 1 GB，單檔 < 100 MB。
+
+## V2 同步輸出（scripts/sync_v2.py，GitHub Action 自動跑）
+- `v2/state.json`、`v2/metadata/<id>.json`、`v2/images/<id>.png`：每顆喵武士的穿著、metadata、圖片
+- `v2/parts/<配件編號>.json`、`v2/thumbs/<配件編號>.png`：配件道具（ERC-1155）的 metadata 與縮圖；traits.json 新增選項會自動產生（配件編號＝部位 × 256＋選項）
+- `v2/price.json`：金庫每 1 ASC 價值的走勢（網站行情圖用；金庫地址可用 Variables `VAULT_V2_ADDRESS` 改，預設主網）

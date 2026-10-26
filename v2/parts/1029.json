@@ -1,0 +1,22 @@
+{
+  "name": "Fox mask0",
+  "description": "AscCatSamurai V2 配件道具：在 ASC 鏢局網站換裝時穿上（道具會銷毀），也可以在配件市場交易。",
+  "image": "https://chase5ws.github.io/2026_asc_web3_ipfs/v2/thumbs/1029.png?v=05c4933151",
+  "attributes": [
+    {
+      "trait_type": "Slot",
+      "value": "Dress"
+    },
+    {
+      "trait_type": "Rarity",
+      "value": "Rare"
+    }
+  ],
+  "properties": {
+    "partId": 1029,
+    "slot": 4,
+    "option": 5,
+    "zh": "狐狸面具",
+    "layer": "https://chase5ws.github.io/2026_asc_web3_ipfs/layers/Dress/Fox mask.png"
+  }
+}

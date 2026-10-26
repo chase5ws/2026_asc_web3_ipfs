@@ -26,7 +26,11 @@ order 決定圖層上下順序。traits.json 的部位與選項只能在後面�
     RPC_URL         Polygon RPC（預設 https://polygon-bor-rpc.publicnode.com）
     SITE_URL        GitHub Pages 網址（預設 https://chase5ws.github.io/2026_asc_web3_ipfs）
     LOG_STEP        每次 eth_getLogs 的區塊數（預設 2000，公共 RPC 有上限）
+    VAULT_V2_ADDRESS   ASC 金庫 AscPointV2（預設主網 0xB0B0…A4bD；填 none 不做走勢）
+    VAULT_FROM_BLOCK   金庫部署區塊（預設 96182573）
 輸出：v2/state.json、v2/metadata/<id>.json、v2/images/<id>.png、v2/images/box.png（盲盒）
+      v2/parts/<配件編號>.json＋v2/thumbs/<配件編號>.png（配件道具的 metadata 與縮圖，AscCatParts 的 uri；traits.json 新增選項會自動產生）
+      v2/price.json（金庫每 1 ASC 價值的走勢，網站讀這個再補最新的區塊）
 """
 import hashlib, json, os, sys, time, urllib.request
 from pathlib import Path
@@ -41,6 +45,8 @@ SITE = (os.environ.get("SITE_URL", "").strip() or "https://chase5ws.github.io/20
 STEP = int(os.environ.get("LOG_STEP", "") or 2000)
 FROM_BLOCK = int(os.environ.get("FROM_BLOCK", "") or 0)
 CONFIRMATIONS = int(os.environ.get("CONFIRMATIONS", "") or 5)
+VAULT = (os.environ.get("VAULT_V2_ADDRESS", "").strip() or "0xb0b0026dbb092adf290df75729619343d51ca4bd").lower()
+VAULT_FROM = int(os.environ.get("VAULT_FROM_BLOCK", "") or 96182573)
 
 # ───────────── keccak256（純 Python，免安裝套件） ─────────────
 _RC = [0x0000000000000001, 0x0000000000008082, 0x800000000000808A, 0x8000000080008000, 0x000000000000808B, 0x0000000080000001,
@@ -124,15 +130,16 @@ def uint_array(data: bytes, offset_word: int):
     return [word(data, start + 1 + k) for k in range(n)]
 
 
-def logs(frm, to):
+def logs(frm, to, address=None, topics=None):
+    address = address or ADDRESS
+    topics = topics or [[T_MINTED, T_PRESET, T_REVEALED, T_EQUIPPED, T_SEED]]
     out = []
     a = frm
     step = STEP
     while a <= to:
         b = min(a + step - 1, to)
         try:
-            out += rpc("eth_getLogs", [{"address": ADDRESS, "fromBlock": hex(a), "toBlock": hex(b),
-                                        "topics": [[T_MINTED, T_PRESET, T_REVEALED, T_EQUIPPED, T_SEED]]}])
+            out += rpc("eth_getLogs", [{"address": address, "fromBlock": hex(a), "toBlock": hex(b), "topics": topics}])
             a = b + 1
         except Exception as e:
             if step <= 50:
@@ -304,6 +311,129 @@ def metadata(tid, tok, picks, version):
     }
 
 
+
+# ───────────── 配件道具：metadata 與縮圖 ─────────────
+
+TIER_NAME = {"super": "Super Rare", "rare": "Rare", "normal": "Common"}
+THUMB = 192
+
+
+def thumb_image(path, out):
+    """配件縮圖：裁到圖層有畫的範圍，置中放進正方形（透明背景）"""
+    from PIL import Image
+    im = layer(path)
+    box = im.getbbox() or (0, 0, SIZE, SIZE)
+    w, h = box[2] - box[0], box[3] - box[1]
+    side = int(max(w, h) * 1.12) or SIZE
+    cx, cy = (box[0] + box[2]) // 2, (box[1] + box[3]) // 2
+    sq = Image.new("RGBA", (side, side), (0, 0, 0, 0))
+    sq.alpha_composite(im.crop(box), (side // 2 - (cx - box[0]), side // 2 - (cy - box[1])))
+    sq.resize((THUMB, THUMB), Image.LANCZOS).save(out, "PNG", optimize=True)
+
+
+def sync_parts():
+    (OUT / "parts").mkdir(parents=True, exist_ok=True)
+    (OUT / "thumbs").mkdir(parents=True, exist_ok=True)
+    made = 0
+    for c, cat in enumerate(CATS):
+        for i, o in enumerate(cat["options"]):
+            if not o.get("file"):
+                continue  # 「不穿」不是道具
+            pid = c * 256 + i
+            sig = hashlib.sha1(json.dumps([o.get("file"), o.get("name"), o.get("zh"), o.get("tier"), (ROOT / o["file"]).stat().st_size], ensure_ascii=False).encode()).hexdigest()[:10]
+            meta_f, img_f = OUT / "parts" / f"{pid}.json", OUT / "thumbs" / f"{pid}.png"
+            if meta_f.exists() and img_f.exists() and sig in meta_f.read_text(encoding="utf-8"):
+                continue
+            thumb_image(o["file"], img_f)
+            meta = {
+                "name": o.get("name"),
+                "description": "AscCatSamurai V2 配件道具：在 ASC 鏢局網站換裝時穿上（道具會銷毀），也可以在配件市場交易。",
+                "image": f"{SITE}/v2/thumbs/{pid}.png?v={sig}",
+                "attributes": [
+                    {"trait_type": "Slot", "value": cat["trait_type"]},
+                    {"trait_type": "Rarity", "value": TIER_NAME.get(o.get("tier", "normal"), "Common")},
+                ],
+                "properties": {"partId": pid, "slot": c, "option": i, "zh": o.get("zh"), "layer": f"{SITE}/{o['file']}"},
+            }
+            meta_f.write_text(json.dumps(meta, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+            made += 1
+    if made:
+        print(f"配件道具：更新 {made} 個 metadata／縮圖")
+
+# ───────────── 金庫走勢（每 1 ASC 價值） ─────────────
+# 依事件重算：可兌換 = USDT 餘額 − 保底（owner 存款 50% ＋ 手續費 − 已提領）− 鎖到下一期；每點價值 = 可兌換 ÷ ASC 總量（最高 1 USDT）
+
+V_TOPICS = {topic(x): x.split("(")[0] for x in [
+    "Transfer(address,address,uint256)", "Bought(address,uint256,uint256)", "Exchanged(address,uint256,uint256)",
+    "ExchangeFee(uint256,uint256,uint256)", "OwnerDeposited(uint256,uint256)", "ReserveWithdrawn(address,uint256,uint256)",
+    "FeeToReserve(address,uint256,uint256)", "PeriodReset(uint256,uint256)", "Shutdown(uint256)", "StartPriceChanged(uint256)"]}
+MAX_PRICE = 1_000_000  # 1 USDT（6 位小數）
+
+
+def vault_value(s):
+    reserve = max(0, s["od"] // 2 + s["rf"] - s["ro"])
+    avail = max(0, s["bal"] - reserve - s["ln"])
+    if s["sup"] == 0 or avail == 0:
+        return s["sp"]
+    return max(1, min(avail // s["sup"], MAX_PRICE))
+
+
+def apply_vault_log(s, name, l):
+    data = bytes.fromhex(l["data"][2:])
+    if name == "Transfer":
+        frm, to, v = int(l["topics"][1], 16), int(l["topics"][2], 16), word(data, 0)
+        if frm == 0:
+            s["sup"] += v
+        if to == 0:
+            s["sup"] -= v
+    elif name == "Bought":
+        s["bal"] += word(data, 0)
+    elif name == "Exchanged":
+        s["bal"] -= word(data, 1)
+    elif name == "ExchangeFee":
+        s["rf"] += word(data, 0)
+        s["ln"] += word(data, 1)
+    elif name == "OwnerDeposited":
+        s["bal"] += word(data, 0)
+        s["od"] = word(data, 1)
+    elif name == "ReserveWithdrawn":
+        s["bal"] -= word(data, 0)
+        s["ro"] += word(data, 0)
+    elif name == "FeeToReserve":
+        s["rf"] += word(data, 1)
+    elif name in ("PeriodReset", "Shutdown"):
+        s["ln"] = 0
+    elif name == "StartPriceChanged":
+        s["sp"] = word(data, 0)
+
+
+def sync_price(head):
+    if VAULT in ("", "none"):
+        return
+    f = OUT / "price.json"
+    p = json.loads(f.read_text(encoding="utf-8")) if f.exists() else {}
+    if p.get("vault") != VAULT:
+        sp = int(rpc("eth_call", [{"to": VAULT, "data": "0x" + keccak(b"startPrice()")[:4].hex()}, "latest"]), 16)
+        p = {"vault": VAULT, "lastBlock": VAULT_FROM - 1, "s": {"bal": 0, "od": 0, "rf": 0, "ro": 0, "ln": 0, "sup": 0, "sp": sp}, "points": []}
+    frm = p["lastBlock"] + 1
+    if frm > head:
+        return
+    found = logs(frm, head, VAULT, [list(V_TOPICS)])
+    s, pts = {k: int(v) for k, v in p["s"].items()}, p["points"]
+    blocks = {}
+    for l in found:
+        apply_vault_log(s, V_TOPICS[l["topics"][0]], l)
+        blocks[int(l["blockNumber"], 16)] = vault_value(s)
+    for b, v in sorted(blocks.items()):
+        if pts and pts[-1][2] == v:
+            continue
+        t = int(rpc("eth_getBlockByNumber", [hex(b), False])["timestamp"], 16)
+        pts.append([b, t, v])
+    p["lastBlock"] = head
+    p["s"] = {k: str(v) for k, v in s.items()}  # 字串：大數字給網站 BigInt 讀
+    f.write_text(json.dumps(p, separators=(",", ":")) + "\n", encoding="utf-8")
+    print(f"金庫走勢：{len(found)} 筆事件，共 {len(pts)} 個點")
+
 def main():
     if not ADDRESS:
         sys.exit("請設定 NFT_V2_ADDRESS")
@@ -360,6 +490,11 @@ def main():
     box = OUT / "images" / "box.png"
     if not box.exists():
         box_image(box)
+    sync_parts()
+    try:
+        sync_price(head)
+    except Exception as e:  # 走勢只是顯示用，失敗不影響外觀同步
+        print(f"⚠️  金庫走勢更新失敗：{e}")
 
     changed = 0
     for tid in sorted(tokens, key=int):

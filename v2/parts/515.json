@@ -1,0 +1,22 @@
+{
+  "name": "Hanfu0",
+  "description": "AscCatSamurai V2 配件道具：在 ASC 鏢局網站換裝時穿上（道具會銷毀），也可以在配件市場交易。",
+  "image": "https://chase5ws.github.io/2026_asc_web3_ipfs/v2/thumbs/515.png?v=4d6ce24fd0",
+  "attributes": [
+    {
+      "trait_type": "Slot",
+      "value": "Clothes"
+    },
+    {
+      "trait_type": "Rarity",
+      "value": "Common"
+    }
+  ],
+  "properties": {
+    "partId": 515,
+    "slot": 2,
+    "option": 3,
+    "zh": null,
+    "layer": "https://chase5ws.github.io/2026_asc_web3_ipfs/layers/Clothes/Hanfu0.png"
+  }
+}

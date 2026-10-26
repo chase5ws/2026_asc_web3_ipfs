@@ -1,0 +1,22 @@
+{
+  "name": "Armor1",
+  "description": "AscCatSamurai V2 配件道具：在 ASC 鏢局網站換裝時穿上（道具會銷毀），也可以在配件市場交易。",
+  "image": "https://chase5ws.github.io/2026_asc_web3_ipfs/v2/thumbs/513.png?v=7cdfec19f3",
+  "attributes": [
+    {
+      "trait_type": "Slot",
+      "value": "Clothes"
+    },
+    {
+      "trait_type": "Rarity",
+      "value": "Super Rare"
+    }
+  ],
+  "properties": {
+    "partId": 513,
+    "slot": 2,
+    "option": 1,
+    "zh": "黃金鎧甲",
+    "layer": "https://chase5ws.github.io/2026_asc_web3_ipfs/layers/Clothes/Armor1.png"
+  }
+}
