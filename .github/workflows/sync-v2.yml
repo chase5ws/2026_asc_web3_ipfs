@@ -31,10 +31,29 @@ jobs:
           RPC_URL: ${{ vars.RPC_URL }}
         run: python3 scripts/sync_v2.py
       - name: 推上 GitHub
+        env:
+          NFT_V2_ADDRESS: ${{ vars.NFT_V2_ADDRESS }}
+          FROM_BLOCK: ${{ vars.FROM_BLOCK }}
+          RPC_URL: ${{ vars.RPC_URL }}
         run: |
           git config user.name "asc-bot"
           git config user.email "asc-bot@users.noreply.github.com"
           git add v2
           if git diff --cached --quiet; then echo "沒有變更"; exit 0; fi
           git commit -m "sync v2: $(date -u +%Y-%m-%dT%H:%MZ)"
-          git push
+          # 推送被拒（期間有別的 commit）：抓最新的，合併後重推；合併不了就以最新版重跑一次同步（結果只由鏈上決定，重跑不會錯）
+          for i in 1 2 3; do
+            git push && exit 0
+            echo "推送被拒，第 $i 次重試"
+            git fetch origin main
+            if ! git rebase -X theirs origin/main; then
+              git rebase --abort || true
+              git reset --hard origin/main
+              python3 scripts/sync_v2.py
+              git add v2
+              if git diff --cached --quiet; then echo "最新版已經是同步過的結果"; exit 0; fi
+              git commit -m "sync v2: $(date -u +%Y-%m-%dT%H:%MZ)"
+            fi
+            sleep $((i * 5))
+          done
+          exit 1
