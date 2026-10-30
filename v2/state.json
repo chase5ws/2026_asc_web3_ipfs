@@ -1,13 +1,13 @@
 {
  "contract": "0xc70e923942b9404268c4842e6a42cfe5be6152e0",
- "lastBlock": 96423038,
+ "lastBlock": 96439129,
  "tokens": {
   "0": {
    "block": 96182688,
    "kind": 3,
    "ref": 0,
-   "rendered": "ac5f3e785e40",
-   "revealed": false,
+   "rendered": "7ffe10976350",
+   "revealed": true,
    "traits": {
     "Body": "Original1",
     "Clothes": "Ninja suit0",

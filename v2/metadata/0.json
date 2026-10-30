@@ -1,11 +1,35 @@
 {
   "name": "AscCatSamurai #0",
-  "description": "AscCatSamurai V2 盲盒 - 在 ASC 鏢局網站解盲後揭曉外觀。",
-  "image": "https://chase5ws.github.io/2026_asc_web3_ipfs/v2/images/box.png",
+  "description": "AscCatSamurai V2 - ASC 鏢局的喵武士。可以用配件換裝，配件道具記錄在 Polygon 鏈上。",
+  "image": "https://chase5ws.github.io/2026_asc_web3_ipfs/v2/images/0.png?v=7ffe10976350",
   "attributes": [
     {
-      "trait_type": "Status",
-      "value": "Unrevealed"
+      "trait_type": "Wepon",
+      "value": "Bamboo sword0"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Original1"
+    },
+    {
+      "trait_type": "Clothes",
+      "value": "Ninja suit0"
+    },
+    {
+      "trait_type": "Face",
+      "value": "Scar2"
+    },
+    {
+      "trait_type": "Dress",
+      "value": "Cigar0"
+    },
+    {
+      "trait_type": "Rarity",
+      "value": "Rare"
+    },
+    {
+      "trait_type": "Origin",
+      "value": "V1 #0"
     }
   ]
 }
