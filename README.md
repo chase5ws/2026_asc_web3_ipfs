@@ -66,3 +66,6 @@ scripts/
 - `v2/state.json`、`v2/metadata/<id>.json`、`v2/images/<id>.png`：每顆喵武士的穿著、metadata、圖片
 - `v2/parts/<配件編號>.json`、`v2/thumbs/<配件編號>.png`：配件道具（ERC-1155）的 metadata 與縮圖；traits.json 新增選項會自動產生（配件編號＝部位 × 256＋選項）
 - `v2/price.json`：金庫每 1 ASC 價值的走勢（網站行情圖用；金庫地址可用 Variables `VAULT_V2_ADDRESS` 改，預設主網）
+
+## 2026-11-03 換裝改由衣櫃合約處理
+`scripts/sync_v2.py` 同時讀 NFT（`NFT_V2_ADDRESS`）與衣櫃 Wardrobe（`WARDROBE_ADDRESS`，預設主網 `0x6bB0D831d87EB27Aa77A6656784830D1171226BB`；填 `none` 不讀）的 `Equipped` 事件（同格式），依區塊順序套用。Action 不用新增變數。配件 metadata 說明改成「由衣櫃保管、換下退回」（會重新產生一次配件 metadata／縮圖）。

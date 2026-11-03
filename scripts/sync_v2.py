@@ -10,6 +10,7 @@ GitHub Action 每 10 分鐘跑一次（.github/workflows/sync-v2.yml），也可
   空投指定外觀（PresetMinted） 複製舊系列 V1 metadata/<ref>.json 的配件
   解盲（Revealed）            之後才公開外觀，之前顯示盲盒
   換裝（Equipped）            partIds 穿上（partId＝部位 × 256 + 選項），clearSlots 脫掉（只限有「不穿」選項的部位）
+                              2026-11 起換裝改由衣櫃合約 Wardrobe（WARDROBE_ADDRESS）處理，它發一模一樣的 Equipped 事件，兩個地址一起讀、依區塊順序套用
 
 管理員可以直接改外觀（例如幫某幾顆加寵物、背景）：
   1. 在 v2/overrides.json 寫 {"編號": {"部位": "選項名稱"}}，每次同步都會套用在最上層（最簡單，建議用這個）
@@ -22,6 +23,7 @@ order 決定圖層上下順序。traits.json 的部位與選項只能在後面�
 
 環境變數：
     NFT_V2_ADDRESS  V2 合約地址（必填）
+    WARDROBE_ADDRESS 衣櫃合約（換裝；預設主網 0x6bB0…26BB，填 none 不讀）
     FROM_BLOCK      合約部署區塊（第一次同步從這裡開始；之後記在 state.json）
     RPC_URL         Polygon RPC（預設 https://polygon-bor-rpc.publicnode.com）
     SITE_URL        GitHub Pages 網址（預設 https://chase5ws.github.io/2026_asc_web3_ipfs）
@@ -40,6 +42,8 @@ TRAITS = json.loads((ROOT / "traits.json").read_text(encoding="utf-8"))
 OUT = ROOT / "v2"
 SIZE = 1024
 ADDRESS = os.environ.get("NFT_V2_ADDRESS", "").strip().lower()
+WARDROBE = (os.environ.get("WARDROBE_ADDRESS", "").strip() or "0x6bb0d831d87eb27aa77a6656784830d1171226bb").lower()
+NFT_ADDRESSES = [a for a in [ADDRESS, "" if WARDROBE == "none" else WARDROBE] if a]
 RPC = os.environ.get("RPC_URL", "").strip() or "https://polygon-bor-rpc.publicnode.com"
 SITE = (os.environ.get("SITE_URL", "").strip() or "https://chase5ws.github.io/2026_asc_web3_ipfs").rstrip("/")
 STEP = int(os.environ.get("LOG_STEP", "") or 2000)
@@ -131,7 +135,7 @@ def uint_array(data: bytes, offset_word: int):
 
 
 def logs(frm, to, address=None, topics=None):
-    address = address or ADDRESS
+    address = address or NFT_ADDRESSES
     topics = topics or [[T_MINTED, T_PRESET, T_REVEALED, T_EQUIPPED, T_SEED]]
     out = []
     a = frm
@@ -340,14 +344,14 @@ def sync_parts():
             if not o.get("file"):
                 continue  # 「不穿」不是道具
             pid = c * 256 + i
-            sig = hashlib.sha1(json.dumps([o.get("file"), o.get("name"), o.get("zh"), o.get("tier"), (ROOT / o["file"]).stat().st_size], ensure_ascii=False).encode()).hexdigest()[:10]
+            sig = hashlib.sha1(json.dumps(["wardrobe", o.get("file"), o.get("name"), o.get("zh"), o.get("tier"), (ROOT / o["file"]).stat().st_size], ensure_ascii=False).encode()).hexdigest()[:10]
             meta_f, img_f = OUT / "parts" / f"{pid}.json", OUT / "thumbs" / f"{pid}.png"
             if meta_f.exists() and img_f.exists() and sig in meta_f.read_text(encoding="utf-8"):
                 continue
             thumb_image(o["file"], img_f)
             meta = {
                 "name": o.get("name"),
-                "description": "AscCatSamurai V2 配件道具：在 ASC 鏢局網站換裝時穿上（道具會銷毀），也可以在配件市場交易。",
+                "description": "AscCatSamurai V2 配件道具：在 ASC 鏢局網站換裝時穿上（由衣櫃保管，換下來退回背包），也可以在配件市場交易。",
                 "image": f"{SITE}/v2/thumbs/{pid}.png?v={sig}",
                 "attributes": [
                     {"trait_type": "Slot", "value": cat["trait_type"]},
