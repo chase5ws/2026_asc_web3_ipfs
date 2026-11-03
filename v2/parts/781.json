@@ -1,7 +1,7 @@
 {
   "name": "Scar2",
-  "description": "AscCatSamurai V2 配件道具：在 ASC 鏢局網站換裝時穿上（道具會銷毀），也可以在配件市場交易。",
-  "image": "https://chase5ws.github.io/2026_asc_web3_ipfs/v2/thumbs/781.png?v=289a8f979c",
+  "description": "AscCatSamurai V2 配件道具：在 ASC 鏢局網站換裝時穿上（由衣櫃保管，換下來退回背包），也可以在配件市場交易。",
+  "image": "https://chase5ws.github.io/2026_asc_web3_ipfs/v2/thumbs/781.png?v=e96c96df58",
   "attributes": [
     {
       "trait_type": "Slot",
