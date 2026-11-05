@@ -69,3 +69,13 @@ scripts/
 
 ## 2026-11-03 換裝改由衣櫃合約處理
 `scripts/sync_v2.py` 同時讀 NFT（`NFT_V2_ADDRESS`）與衣櫃 Wardrobe（`WARDROBE_ADDRESS`，預設主網衣櫃代理 `0x68eD0610A8244769eA2C745dA49a2FBA4354490A`（2026-11-05 部署；之前寫的 0x6bB0…26BB 是實作合約，不會有換裝事件）；填 `none` 不讀）的 `Equipped` 事件（同格式），依區塊順序套用。Action 不用新增變數。配件 metadata 說明改成「由衣櫃保管、換下退回」（會重新產生一次配件 metadata／縮圖）。
+
+## 2026-11-05 活動背景（活動徽章 EventBadges）
+- 背景不是 ERC-1155 配件，是活動徽章合約（不能轉移）的徽章。在 `traits.json` 的 categories **最後面**加一類：
+  ```json
+  { "trait_type": "Background", "badges": true, "options": [
+      { "name": "MidAutumn2026", "zh": "2026 中秋賞月", "file": "layers/Background/mid-autumn-2026.png", "badge": 1 } ] }
+  ```
+  `badge` ＝ 管理面板建立活動時填的活動編號。背景圖建議 1024×1024（不是正方形會置中裁切）；貓咪在中間偏下，重點放上方或兩側。
+- `scripts/sync_v2.py`：產生 `v2/badges/<編號>.json／.png`（徽章 metadata，合約 baseURI 指到 `…/v2/badges/`）；每次用 `backgroundsOf` 讀每隻現在有效的背景（轉手、收回就是 0），畫在最底層，metadata 加 `Background` 屬性。
+- Actions 變數 `BADGES_ADDRESS` 填活動徽章合約（代理）地址；沒填就不畫背景。

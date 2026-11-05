@@ -49,6 +49,8 @@ SITE = (os.environ.get("SITE_URL", "").strip() or "https://chase5ws.github.io/20
 STEP = int(os.environ.get("LOG_STEP", "") or 2000)
 FROM_BLOCK = int(os.environ.get("FROM_BLOCK", "") or 0)
 CONFIRMATIONS = int(os.environ.get("CONFIRMATIONS", "") or 5)
+# 活動徽章 EventBadges（活動背景，不能轉移）：部署後在 Actions 變數 BADGES_ADDRESS 填代理地址；沒填就不畫背景
+BADGES = os.environ.get("BADGES_ADDRESS", "").strip().lower()
 VAULT = (os.environ.get("VAULT_V2_ADDRESS", "").strip() or "0xb0b0026dbb092adf290df75729619343d51ca4bd").lower()
 VAULT_FROM = int(os.environ.get("VAULT_FROM_BLOCK", "") or 96182573)
 
@@ -155,7 +157,12 @@ def logs(frm, to, address=None, topics=None):
 
 # ───────────── 外觀 ─────────────
 
-CATS = TRAITS["categories"]
+# 活動背景（"badges": true）不是 ERC-1155 配件：不算部位編號、不產生配件 metadata，必須放在 categories 最後面
+CATS = [c for c in TRAITS["categories"] if not c.get("badges")]
+BG_CAT = next((c for c in TRAITS["categories"] if c.get("badges")), None)
+if BG_CAT is not None and TRAITS["categories"][-1] is not BG_CAT:
+    sys.exit("traits.json：活動背景（badges: true）要放在 categories 最後面，不然配件編號會跑掉")
+BG_OPTS = {int(o["badge"]): o for o in (BG_CAT or {}).get("options", []) if o.get("badge") is not None and o.get("file")}
 BY_TYPE = {c["trait_type"]: c for c in CATS}
 ALIASES = TRAITS.get("aliases", {})
 
@@ -268,9 +275,24 @@ def draw_order(picks):
     return sorted(picks, key=lambda p: rank.get(p[0]["trait_type"], len(order) + CATS.index(p[0])))
 
 
-def render(picks, out):
+def bg_layer(path):
+    """活動背景：裁成正方形（置中）再縮到 SIZE，不會被拉長變形"""
+    from PIL import Image
+    key = ("bg", path)
+    if key not in _cache:
+        im = Image.open(ROOT / path).convert("RGBA")
+        w, h = im.size
+        s = min(w, h)
+        im = im.crop(((w - s) // 2, (h - s) // 2, (w - s) // 2 + s, (h - s) // 2 + s))
+        _cache[key] = im.resize((SIZE, SIZE), Image.LANCZOS) if s != SIZE else im
+    return _cache[key]
+
+
+def render(picks, out, bg=None):
     from PIL import Image
     im = Image.new("RGBA", (SIZE, SIZE), (0, 0, 0, 0))
+    if bg:  # 活動背景畫在最底層
+        im.alpha_composite(bg_layer(bg["file"]))
     for _, o in draw_order(picks):
         if o.get("file"):
             im.alpha_composite(layer(o["file"]))
@@ -291,7 +313,7 @@ def box_image(out):
     im.save(out, "PNG", optimize=True)
 
 
-def metadata(tid, tok, picks, version):
+def metadata(tid, tok, picks, version, bg=None):
     if not tok.get("revealed"):
         return {
             "name": f"AscCatSamurai #{tid}",
@@ -305,6 +327,8 @@ def metadata(tid, tok, picks, version):
         tiers.append(o.get("tier", "normal"))
     rarity = "Super Rare" if "super" in tiers else "Rare" if "rare" in tiers else "Common"
     attrs.append({"trait_type": "Rarity", "value": rarity})
+    if bg:
+        attrs.append({"trait_type": "Background", "value": bg.get("name")})
     if tok.get("kind") == 3:
         attrs.append({"trait_type": "Origin", "value": f"V1 #{tok.get('ref')}"})
     return {
@@ -363,6 +387,53 @@ def sync_parts():
             made += 1
     if made:
         print(f"配件道具：更新 {made} 個 metadata／縮圖")
+
+# ───────────── 活動背景：徽章 metadata 與每隻喵武士現在的背景 ─────────────
+
+def sync_badges():
+    """v2/badges/<活動編號>.json 與 .png（活動徽章合約的 uri 指到這裡）"""
+    if not BG_OPTS:
+        return
+    from PIL import Image
+    (OUT / "badges").mkdir(parents=True, exist_ok=True)
+    made = 0
+    for bid, o in BG_OPTS.items():
+        sig = hashlib.sha1(json.dumps(["badge", o.get("file"), o.get("name"), o.get("zh"), (ROOT / o["file"]).stat().st_size], ensure_ascii=False).encode()).hexdigest()[:10]
+        meta_f, img_f = OUT / "badges" / f"{bid}.json", OUT / "badges" / f"{bid}.png"
+        if meta_f.exists() and img_f.exists() and sig in meta_f.read_text(encoding="utf-8"):
+            continue
+        bg_layer(o["file"]).resize((512, 512), Image.LANCZOS).convert("RGB").save(img_f, "PNG", optimize=True)
+        meta = {
+            "name": o.get("zh") or o.get("name"),
+            "description": "ASC 鏢局活動徽章：參加活動時用代碼領取，綁定錢包、不能轉賣。可以當背景穿在自己的喵武士上（喵武士轉手後背景會自動拿掉）。",
+            "image": f"{SITE}/v2/badges/{bid}.png?v={sig}",
+            "attributes": [{"trait_type": "Type", "value": "Event background"}, {"trait_type": "Event", "value": bid}, {"trait_type": "Background", "value": o.get("name")}],
+            "properties": {"badge": bid, "zh": o.get("zh"), "layer": f"{SITE}/{o['file']}"},
+        }
+        meta_f.write_text(json.dumps(meta, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        made += 1
+    if made:
+        print(f"活動徽章：更新 {made} 個 metadata／圖")
+
+
+def read_backgrounds(tokens):
+    """backgroundsOf(全部編號)：喵武士轉手、徽章被收回時合約會回 0，所以每次都整批重讀"""
+    if not BADGES or not tokens:
+        return
+    ids = sorted(int(t) for t in tokens)
+    data = keccak(b"backgroundsOf(uint256[])")[:4] + (32).to_bytes(32, "big") + len(ids).to_bytes(32, "big") + b"".join(i.to_bytes(32, "big") for i in ids)
+    try:
+        res = bytes.fromhex(rpc("eth_call", [{"to": BADGES, "data": "0x" + data.hex()}, "latest"])[2:])
+        bgs = uint_array(res, 0)
+    except Exception as e:  # 背景只是外觀，讀不到就沿用上次的結果
+        print(f"⚠️  讀活動背景失敗：{e}")
+        return
+    for i, b in zip(ids, bgs):
+        tok = tokens[str(i)]
+        if b and b in BG_OPTS:
+            tok["bg"] = b
+        else:
+            tok.pop("bg", None)
 
 # ───────────── 金庫走勢（每 1 ASC 價值） ─────────────
 # 依事件重算：可兌換 = USDT 餘額 − 保底（owner 存款 50% ＋ 手續費 − 已提領）− 鎖到下一期；每點價值 = 可兌換 ÷ ASC 總量（最高 1 USDT）
@@ -495,6 +566,8 @@ def main():
     if not box.exists():
         box_image(box)
     sync_parts()
+    sync_badges()
+    read_backgrounds(tokens)
     try:
         sync_price(head)
     except Exception as e:  # 走勢只是顯示用，失敗不影響外觀同步
@@ -507,14 +580,16 @@ def main():
             tok["traits"] = roll_traits(tok["seed"])
         resolve_pending(tok)
         picks = final_traits(tok, overrides.get(tid))
-        sig = hashlib.sha1(json.dumps([tok.get("revealed"), [(c["trait_type"], o["name"]) for c, o in picks]], ensure_ascii=False).encode()).hexdigest()[:12]
+        bg = BG_OPTS.get(tok.get("bg") or 0)
+        look = [(c["trait_type"], o["name"]) for c, o in picks] + ([("Background", bg["name"])] if bg else [])
+        sig = hashlib.sha1(json.dumps([tok.get("revealed"), look], ensure_ascii=False).encode()).hexdigest()[:12]
         img = OUT / "images" / f"{tid}.png"
         meta = OUT / "metadata" / f"{tid}.json"
         if tok.get("rendered") == sig and meta.exists() and (img.exists() or not tok.get("revealed")):
             continue
         if tok.get("revealed"):
-            render(picks, img)
-        meta.write_text(json.dumps(metadata(tid, tok, picks, sig), ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+            render(picks, img, bg)
+        meta.write_text(json.dumps(metadata(tid, tok, picks, sig, bg), ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
         tok["rendered"] = sig
         changed += 1
         print(f"✅ #{tid} {'（盲盒）' if not tok.get('revealed') else ' / '.join(o['name'] for _, o in picks)}")
