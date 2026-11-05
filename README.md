@@ -78,5 +78,5 @@ scripts/
   ```
   `badge` ＝ 管理面板建立活動時填的活動編號。背景圖建議 1024×1024（不是正方形會置中裁切）；貓咪在中間偏下，重點放上方或兩側。
 - `scripts/sync_v2.py`：產生 `v2/badges/<編號>.json／.png`（徽章 metadata，合約 baseURI 指到 `…/v2/badges/`）；每次用 `backgroundsOf` 讀每隻現在有效的背景（轉手、收回就是 0），畫在最底層，metadata 加 `Background` 屬性。
-- Actions 變數 `BADGES_ADDRESS` 填活動徽章合約（代理）地址；沒填就不畫背景。
+- 活動徽章合約（代理）預設主網 `0x445eE4A94477a87b95E066DD0A32e0bBB174c2B5`（2026-11-05 部署）；Actions 變數 `BADGES_ADDRESS` 可以改，填 `none` 不讀。
 - 背景預設透明：Background 第一個選項 `Transparent`（file null）。合約部署前要測試可以用 `v2/overrides.json` 寫 `{"編號": {"Background": "White"}}`（目前 #0 是白底測試），鏈上有穿背景時以鏈上為準；測完把那一行刪掉就回到透明。

@@ -49,8 +49,8 @@ SITE = (os.environ.get("SITE_URL", "").strip() or "https://chase5ws.github.io/20
 STEP = int(os.environ.get("LOG_STEP", "") or 2000)
 FROM_BLOCK = int(os.environ.get("FROM_BLOCK", "") or 0)
 CONFIRMATIONS = int(os.environ.get("CONFIRMATIONS", "") or 5)
-# 活動徽章 EventBadges（活動背景，不能轉移）：部署後在 Actions 變數 BADGES_ADDRESS 填代理地址；沒填就不畫背景
-BADGES = os.environ.get("BADGES_ADDRESS", "").strip().lower()
+# 活動徽章 EventBadges（活動背景，不能轉移）：預設主網代理 0x445e…c2B5；Actions 變數 BADGES_ADDRESS 可以改，填 none 不讀
+BADGES = (os.environ.get("BADGES_ADDRESS", "").strip() or "0x445ee4a94477a87b95e066dd0a32e0bbb174c2b5").lower()
 VAULT = (os.environ.get("VAULT_V2_ADDRESS", "").strip() or "0xb0b0026dbb092adf290df75729619343d51ca4bd").lower()
 VAULT_FROM = int(os.environ.get("VAULT_FROM_BLOCK", "") or 96182573)
 
@@ -420,7 +420,7 @@ def sync_badges():
 
 def read_backgrounds(tokens):
     """backgroundsOf(全部編號)：喵武士轉手、徽章被收回時合約會回 0，所以每次都整批重讀"""
-    if not BADGES or not tokens:
+    if not BADGES or BADGES == "none" or not tokens:
         return
     ids = sorted(int(t) for t in tokens)
     data = keccak(b"backgroundsOf(uint256[])")[:4] + (32).to_bytes(32, "big") + len(ids).to_bytes(32, "big") + b"".join(i.to_bytes(32, "big") for i in ids)
