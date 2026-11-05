@@ -23,7 +23,7 @@ order 決定圖層上下順序。traits.json 的部位與選項只能在後面�
 
 環境變數：
     NFT_V2_ADDRESS  V2 合約地址（必填）
-    WARDROBE_ADDRESS 衣櫃合約（換裝；預設主網 0x6bB0…26BB，填 none 不讀）
+    WARDROBE_ADDRESS 衣櫃合約（換裝；預設主網代理 0x68eD…490A，填 none 不讀）
     FROM_BLOCK      合約部署區塊（第一次同步從這裡開始；之後記在 state.json）
     RPC_URL         Polygon RPC（預設 https://polygon-bor-rpc.publicnode.com）
     SITE_URL        GitHub Pages 網址（預設 https://chase5ws.github.io/2026_asc_web3_ipfs）
@@ -42,7 +42,7 @@ TRAITS = json.loads((ROOT / "traits.json").read_text(encoding="utf-8"))
 OUT = ROOT / "v2"
 SIZE = 1024
 ADDRESS = os.environ.get("NFT_V2_ADDRESS", "").strip().lower()
-WARDROBE = (os.environ.get("WARDROBE_ADDRESS", "").strip() or "0x6bb0d831d87eb27aa77a6656784830d1171226bb").lower()
+WARDROBE = (os.environ.get("WARDROBE_ADDRESS", "").strip() or "0x68ed0610a8244769ea2c745da49a2fba4354490a").lower()
 NFT_ADDRESSES = [a for a in [ADDRESS, "" if WARDROBE == "none" else WARDROBE] if a]
 RPC = os.environ.get("RPC_URL", "").strip() or "https://polygon-bor-rpc.publicnode.com"
 SITE = (os.environ.get("SITE_URL", "").strip() or "https://chase5ws.github.io/2026_asc_web3_ipfs").rstrip("/")

@@ -29,12 +29,14 @@ jobs:
           NFT_V2_ADDRESS: ${{ vars.NFT_V2_ADDRESS }}
           FROM_BLOCK: ${{ vars.FROM_BLOCK }}
           RPC_URL: ${{ vars.RPC_URL }}
+          WARDROBE_ADDRESS: ${{ vars.WARDROBE_ADDRESS }}
         run: python3 scripts/sync_v2.py
       - name: 推上 GitHub
         env:
           NFT_V2_ADDRESS: ${{ vars.NFT_V2_ADDRESS }}
           FROM_BLOCK: ${{ vars.FROM_BLOCK }}
           RPC_URL: ${{ vars.RPC_URL }}
+          WARDROBE_ADDRESS: ${{ vars.WARDROBE_ADDRESS }}
         run: |
           git config user.name "asc-bot"
           git config user.email "asc-bot@users.noreply.github.com"

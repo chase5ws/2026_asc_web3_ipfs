@@ -68,4 +68,4 @@ scripts/
 - `v2/price.json`：金庫每 1 ASC 價值的走勢（網站行情圖用；金庫地址可用 Variables `VAULT_V2_ADDRESS` 改，預設主網）
 
 ## 2026-11-03 換裝改由衣櫃合約處理
-`scripts/sync_v2.py` 同時讀 NFT（`NFT_V2_ADDRESS`）與衣櫃 Wardrobe（`WARDROBE_ADDRESS`，預設主網 `0x6bB0D831d87EB27Aa77A6656784830D1171226BB`；填 `none` 不讀）的 `Equipped` 事件（同格式），依區塊順序套用。Action 不用新增變數。配件 metadata 說明改成「由衣櫃保管、換下退回」（會重新產生一次配件 metadata／縮圖）。
+`scripts/sync_v2.py` 同時讀 NFT（`NFT_V2_ADDRESS`）與衣櫃 Wardrobe（`WARDROBE_ADDRESS`，預設主網衣櫃代理 `0x68eD0610A8244769eA2C745dA49a2FBA4354490A`（2026-11-05 部署；之前寫的 0x6bB0…26BB 是實作合約，不會有換裝事件）；填 `none` 不讀）的 `Equipped` 事件（同格式），依區塊順序套用。Action 不用新增變數。配件 metadata 說明改成「由衣櫃保管、換下退回」（會重新產生一次配件 metadata／縮圖）。
