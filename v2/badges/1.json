@@ -1,0 +1,24 @@
+{
+  "name": "白色（測試）",
+  "description": "ASC 鏢局活動徽章：參加活動時用代碼領取，綁定錢包、不能轉賣。可以當背景穿在自己的喵武士上（喵武士轉手後背景會自動拿掉）。",
+  "image": "https://chase5ws.github.io/2026_asc_web3_ipfs/v2/badges/1.png?v=98ff363952",
+  "attributes": [
+    {
+      "trait_type": "Type",
+      "value": "Event background"
+    },
+    {
+      "trait_type": "Event",
+      "value": 1
+    },
+    {
+      "trait_type": "Background",
+      "value": "White"
+    }
+  ],
+  "properties": {
+    "badge": 1,
+    "zh": "白色（測試）",
+    "layer": "https://chase5ws.github.io/2026_asc_web3_ipfs/layers/Background/White.png"
+  }
+}

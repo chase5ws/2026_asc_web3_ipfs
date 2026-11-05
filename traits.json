@@ -377,6 +377,23 @@
           "zh": "無配件"
         }
       ]
+    },
+    {
+      "trait_type": "Background",
+      "badges": true,
+      "options": [
+        {
+          "name": "Transparent",
+          "zh": "透明（預設）",
+          "file": null
+        },
+        {
+          "name": "White",
+          "zh": "白色（測試）",
+          "file": "layers/Background/White.png",
+          "badge": 1
+        }
+      ]
     }
   ]
 }

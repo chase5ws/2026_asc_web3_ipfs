@@ -1,7 +1,7 @@
 {
   "name": "AscCatSamurai #10",
   "description": "AscCatSamurai V2 - ASC 鏢局的喵武士。可以用配件換裝，配件道具記錄在 Polygon 鏈上。",
-  "image": "https://chase5ws.github.io/2026_asc_web3_ipfs/v2/images/10.png?v=1842e1776c9c",
+  "image": "https://chase5ws.github.io/2026_asc_web3_ipfs/v2/images/10.png?v=e2565a2f4fd0",
   "attributes": [
     {
       "trait_type": "Wepon",
@@ -26,6 +26,10 @@
     {
       "trait_type": "Rarity",
       "value": "Common"
+    },
+    {
+      "trait_type": "Background",
+      "value": "Transparent"
     },
     {
       "trait_type": "Origin",

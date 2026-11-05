@@ -163,6 +163,8 @@ BG_CAT = next((c for c in TRAITS["categories"] if c.get("badges")), None)
 if BG_CAT is not None and TRAITS["categories"][-1] is not BG_CAT:
     sys.exit("traits.json：活動背景（badges: true）要放在 categories 最後面，不然配件編號會跑掉")
 BG_OPTS = {int(o["badge"]): o for o in (BG_CAT or {}).get("options", []) if o.get("badge") is not None and o.get("file")}
+# 沒穿活動背景時的名稱（預設透明：圖片背景是透明的）
+BG_NONE = next((o["name"] for o in (BG_CAT or {}).get("options", []) if not o.get("file")), "Transparent")
 BY_TYPE = {c["trait_type"]: c for c in CATS}
 ALIASES = TRAITS.get("aliases", {})
 
@@ -327,8 +329,8 @@ def metadata(tid, tok, picks, version, bg=None):
         tiers.append(o.get("tier", "normal"))
     rarity = "Super Rare" if "super" in tiers else "Rare" if "rare" in tiers else "Common"
     attrs.append({"trait_type": "Rarity", "value": rarity})
-    if bg:
-        attrs.append({"trait_type": "Background", "value": bg.get("name")})
+    if BG_CAT is not None:
+        attrs.append({"trait_type": "Background", "value": bg.get("name") if bg else BG_NONE})
     if tok.get("kind") == 3:
         attrs.append({"trait_type": "Origin", "value": f"V1 #{tok.get('ref')}"})
     return {
@@ -581,7 +583,10 @@ def main():
         resolve_pending(tok)
         picks = final_traits(tok, overrides.get(tid))
         bg = BG_OPTS.get(tok.get("bg") or 0)
-        look = [(c["trait_type"], o["name"]) for c, o in picks] + ([("Background", bg["name"])] if bg else [])
+        ov = (overrides.get(tid) or {}).get("Background")
+        if not bg and ov:  # 測試／手動：v2/overrides.json 寫 {"編號": {"Background": "選項名稱"}}（鏈上有穿背景時以鏈上為準）
+            bg = next((o for o in BG_OPTS.values() if o["name"] == ov), None)
+        look = [(c["trait_type"], o["name"]) for c, o in picks] + [("Background", bg["name"] if bg else BG_NONE)]
         sig = hashlib.sha1(json.dumps([tok.get("revealed"), look], ensure_ascii=False).encode()).hexdigest()[:12]
         img = OUT / "images" / f"{tid}.png"
         meta = OUT / "metadata" / f"{tid}.json"
