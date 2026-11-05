@@ -1,6 +1,6 @@
 {
  "contract": "0xc70e923942b9404268c4842e6a42cfe5be6152e0",
- "lastBlock": 96763307,
+ "lastBlock": 96782072,
  "tokens": {
   "0": {
    "block": 96182688,
@@ -20,7 +20,7 @@
    "block": 96182688,
    "kind": 3,
    "ref": 1,
-   "rendered": "8a47792c4f52",
+   "rendered": "cf31cc06f82e",
    "revealed": false,
    "traits": {
     "Body": "Tabby2",
@@ -48,7 +48,7 @@
    "block": 96182688,
    "kind": 3,
    "ref": 11,
-   "rendered": "63a07dea2fa9",
+   "rendered": "7cba12257ee4",
    "revealed": false,
    "traits": {
     "Body": "Pure0",
@@ -62,7 +62,7 @@
    "block": 96182688,
    "kind": 3,
    "ref": 12,
-   "rendered": "8a3f69009e47",
+   "rendered": "ee2428b44b0b",
    "revealed": false,
    "traits": {
     "Body": "Pure2",
@@ -76,7 +76,7 @@
    "block": 96182688,
    "kind": 3,
    "ref": 13,
-   "rendered": "82ecb73521dc",
+   "rendered": "842937655e5d",
    "revealed": false,
    "traits": {
     "Body": "Broken2",
@@ -90,7 +90,7 @@
    "block": 96182688,
    "kind": 3,
    "ref": 14,
-   "rendered": "ab995ec1b48c",
+   "rendered": "112673723433",
    "revealed": false,
    "traits": {
     "Body": "Tabby0",
@@ -104,7 +104,7 @@
    "block": 96182688,
    "kind": 3,
    "ref": 15,
-   "rendered": "8e10c14d7c64",
+   "rendered": "f53e318cd568",
    "revealed": false,
    "traits": {
     "Body": "Tabby0",
@@ -118,7 +118,7 @@
    "block": 96182688,
    "kind": 3,
    "ref": 16,
-   "rendered": "fe4fd7964a43",
+   "rendered": "acbbefd1cc51",
    "revealed": false,
    "traits": {
     "Body": "Tabby1",
@@ -132,7 +132,7 @@
    "block": 96182688,
    "kind": 3,
    "ref": 17,
-   "rendered": "3bec211bedc3",
+   "rendered": "bd18f1b3d99b",
    "revealed": false,
    "traits": {
     "Body": "Original0",
@@ -146,7 +146,7 @@
    "block": 96182688,
    "kind": 3,
    "ref": 18,
-   "rendered": "56ace729ee81",
+   "rendered": "ec122ac81844",
    "revealed": false,
    "traits": {
     "Body": "Broken3",
@@ -160,7 +160,7 @@
    "block": 96182688,
    "kind": 3,
    "ref": 19,
-   "rendered": "c636d0b1689c",
+   "rendered": "7fc9511a71c9",
    "revealed": false,
    "traits": {
     "Body": "Pure0",
@@ -174,7 +174,7 @@
    "block": 96182688,
    "kind": 3,
    "ref": 2,
-   "rendered": "1dee5e95f643",
+   "rendered": "db24e435d84f",
    "revealed": false,
    "traits": {
     "Body": "Tabby0",
@@ -188,7 +188,7 @@
    "block": 96182688,
    "kind": 3,
    "ref": 20,
-   "rendered": "6d57718890cf",
+   "rendered": "d3359b5be47f",
    "revealed": false,
    "traits": {
     "Body": "Broken0",
@@ -202,7 +202,7 @@
    "block": 96182688,
    "kind": 3,
    "ref": 21,
-   "rendered": "73c445aff2a8",
+   "rendered": "6fcf27f13da6",
    "revealed": false,
    "traits": {
     "Body": "Tabby0",
@@ -216,7 +216,7 @@
    "block": 96182688,
    "kind": 3,
    "ref": 22,
-   "rendered": "0a09cde9459d",
+   "rendered": "a674a86be97b",
    "revealed": false,
    "traits": {
     "Body": "Tabby2",
@@ -230,7 +230,7 @@
    "block": 96182688,
    "kind": 3,
    "ref": 23,
-   "rendered": "5d7fa52ad125",
+   "rendered": "9e5f58bcbca2",
    "revealed": false,
    "traits": {
     "Body": "Broken0",
@@ -244,7 +244,7 @@
    "block": 96182688,
    "kind": 3,
    "ref": 24,
-   "rendered": "705d4c773c9b",
+   "rendered": "dd0bf4c78e5f",
    "revealed": false,
    "traits": {
     "Body": "Pure2",
@@ -258,7 +258,7 @@
    "block": 96182688,
    "kind": 3,
    "ref": 25,
-   "rendered": "40ec9458c67e",
+   "rendered": "ff1b6e4d6c8e",
    "revealed": false,
    "traits": {
     "Body": "Broken0",
@@ -272,7 +272,7 @@
    "block": 96182688,
    "kind": 3,
    "ref": 26,
-   "rendered": "b8d10b09024f",
+   "rendered": "4b04f902df5a",
    "revealed": false,
    "traits": {
     "Body": "Original1",
@@ -286,7 +286,7 @@
    "block": 96182688,
    "kind": 3,
    "ref": 27,
-   "rendered": "d1d206a5e64f",
+   "rendered": "24691d9a756a",
    "revealed": false,
    "traits": {
     "Body": "Pure0",
@@ -300,7 +300,7 @@
    "block": 96182688,
    "kind": 3,
    "ref": 28,
-   "rendered": "880c1a0fdc8c",
+   "rendered": "976bb432ce8a",
    "revealed": false,
    "traits": {
     "Body": "Pure1",
@@ -314,7 +314,7 @@
    "block": 96182688,
    "kind": 3,
    "ref": 29,
-   "rendered": "f8b4b0fec8bb",
+   "rendered": "2610bbf1995b",
    "revealed": false,
    "traits": {
     "Body": "Tabby1",
@@ -328,7 +328,7 @@
    "block": 96182688,
    "kind": 3,
    "ref": 3,
-   "rendered": "90011b7b65bc",
+   "rendered": "ab3a84e6bee3",
    "revealed": false,
    "traits": {
     "Body": "Tuxedo0",
@@ -342,7 +342,7 @@
    "block": 96182688,
    "kind": 3,
    "ref": 30,
-   "rendered": "d424c60c5417",
+   "rendered": "bb468b8a0fef",
    "revealed": false,
    "traits": {
     "Body": "Broken2",
@@ -356,7 +356,7 @@
    "block": 96182688,
    "kind": 3,
    "ref": 4,
-   "rendered": "8560a61abf04",
+   "rendered": "7d88abaf0c82",
    "revealed": false,
    "traits": {
     "Body": "Original0",
@@ -426,7 +426,7 @@
    "block": 96182688,
    "kind": 3,
    "ref": 9,
-   "rendered": "89d47b119e92",
+   "rendered": "d8fb89452710",
    "revealed": false,
    "traits": {
     "Body": "Original0",
