@@ -1,15 +1,15 @@
 {
  "contract": "0xc70e923942b9404268c4842e6a42cfe5be6152e0",
- "lastBlock": 96753801,
+ "lastBlock": 96763307,
  "tokens": {
   "0": {
    "block": 96182688,
    "kind": 3,
    "ref": 0,
-   "rendered": "7ffe10976350",
+   "rendered": "6330288df848",
    "revealed": true,
    "traits": {
-    "Body": "Original1",
+    "Body": "Tuxedo0",
     "Clothes": "Ninja suit0",
     "Dress": "Cigar0",
     "Face": "Scar2",
@@ -34,8 +34,8 @@
    "block": 96182688,
    "kind": 3,
    "ref": 10,
-   "rendered": "c6758e32219b",
-   "revealed": false,
+   "rendered": "1842e1776c9c",
+   "revealed": true,
    "traits": {
     "Body": "Tuxedo0",
     "Clothes": "Hanfu1",
@@ -370,8 +370,8 @@
    "block": 96182688,
    "kind": 3,
    "ref": 5,
-   "rendered": "d912aa4ad48b",
-   "revealed": false,
+   "rendered": "cdc5a8c129e0",
+   "revealed": true,
    "traits": {
     "Body": "Tabby1",
     "Clothes": "Ninja suit0",
@@ -384,8 +384,8 @@
    "block": 96182688,
    "kind": 3,
    "ref": 6,
-   "rendered": "13d825a7e151",
-   "revealed": false,
+   "rendered": "feccc66d0854",
+   "revealed": true,
    "traits": {
     "Body": "Pure0",
     "Clothes": "Hanfu1",
@@ -398,8 +398,8 @@
    "block": 96182688,
    "kind": 3,
    "ref": 7,
-   "rendered": "dc31f21aada7",
-   "revealed": false,
+   "rendered": "df3cb87402ae",
+   "revealed": true,
    "traits": {
     "Body": "Pure0",
     "Clothes": "Kimono3",
@@ -412,8 +412,8 @@
    "block": 96182688,
    "kind": 3,
    "ref": 8,
-   "rendered": "794a7e38a303",
-   "revealed": false,
+   "rendered": "85a35e870b92",
+   "revealed": true,
    "traits": {
     "Body": "Broken3",
     "Clothes": "Ninja suit0",
